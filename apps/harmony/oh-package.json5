@@ -1,6 +1,6 @@
 {
-  "modelVersion": "5.0.0",
-  "description": "噗噗记 — 带薪拉屎 APP",
+  "modelVersion": "6.1.0",
+  "description": "Please describe the basic information.",
   "dependencies": {
   },
   "devDependencies": {
