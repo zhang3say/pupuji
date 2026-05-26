@@ -49,7 +49,7 @@ pupuji/
 
 ```bash
 # 如果使用已有的 PostgreSQL（如本地 local-postgres 容器）：
-docker exec -it local-postgres psql -U postgres -c "CREATE DATABASE pupuji;"
+docker exec -it local-postgres psql -U testuser -d postgres -c "CREATE DATABASE pupuji;"
 
 # 启动 Redis
 docker compose up -d redis
@@ -71,7 +71,7 @@ cd server && uv sync
 ### 3. 配置环境变量
 
 ```bash
-cp .env.example .env
+cd server && cp .env.example .env
 # 按需修改 .env 中的数据库地址、JWT 密钥等
 ```
 
