@@ -95,7 +95,19 @@ pnpm dev:server    # FastAPI → http://localhost:8010
 
 用 DevEco Studio 打开 `apps/harmony/` 目录，连接模拟器或真机运行。
 
-## 常用命令
+## 部署
+
+```bash
+# 1. 配置环境变量
+cd server && cp .env.example .env
+# 编辑 .env 填入生产环境数据库地址和 JWT 密钥
+
+# 2. 一键启动（PostgreSQL + FastAPI）
+docker compose up -d --build
+
+# 3. 执行数据库迁移
+docker compose exec server alembic upgrade head
+```
 
 | 命令 | 说明 |
 |------|------|
