@@ -2,9 +2,8 @@
   "name": "pupuji",
   "private": true,
   "scripts": {
-    "dev": "concurrently -n server,redis -c blue,red \"pnpm dev:server\" \"pnpm dev:redis\"",
+    "dev": "pnpm dev:server",
     "dev:server": "cd server && uv run uvicorn main:app --reload --host 0.0.0.0 --port 8000",
-    "dev:redis": "docker compose up -d redis && docker compose logs -f redis",
     "db:migrate": "cd server && uv run alembic revision --autogenerate",
     "db:upgrade": "cd server && uv run alembic upgrade head",
     "lint": "cd server && uv run ruff check .",

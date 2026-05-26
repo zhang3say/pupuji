@@ -11,7 +11,6 @@
 | 鸿蒙端 | ArkTS / ArkUI (HarmonyOS NEXT API 12+) |
 | 后端 | FastAPI + SQLAlchemy 2.0 + Alembic |
 | 数据库 | PostgreSQL 16 |
-| 缓存 | Redis 7 |
 | 共享类型 | TypeScript (packages/shared) |
 | 项目管理 | pnpm workspace Monorepo |
 | Python 依赖 | uv |
@@ -42,7 +41,7 @@ pupuji/
 
 - **Python** >= 3.11 + [uv](https://docs.astral.sh/uv/)
 - **Node.js** >= 18 + [pnpm](https://pnpm.io/)
-- **Docker** (PostgreSQL + Redis)
+- **Docker** (PostgreSQL)
 - **DevEco Studio** (鸿蒙端，仅 Windows/macOS)
 
 ### 1. 启动依赖服务
@@ -50,9 +49,6 @@ pupuji/
 ```bash
 # 如果使用已有的 PostgreSQL（如本地 local-postgres 容器）：
 docker exec -it local-postgres psql -U testuser -d postgres -c "CREATE DATABASE pupuji;"
-
-# 启动 Redis
-docker compose up -d redis
 
 # 如果从头开始：
 docker compose up -d

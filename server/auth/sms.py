@@ -1,8 +1,13 @@
 import logging
 import random
+from datetime import datetime, timedelta, timezone
+
+from sqlalchemy import delete, select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from config import settings
-from auth.redis import redis_client
+from database import async_session
+from models.verification_code import VerificationCode
 
 logger = logging.getLogger(__name__)
 
@@ -12,22 +17,45 @@ def generate_code() -> str:
 
 
 async def send_code(phone: str) -> bool:
-    resent_key = f"sms:resent:{phone}"
-    if await redis_client.exists(resent_key):
-        return False
+    async with async_session() as db:
+        # Check rate limit: any code sent to this phone in last 60s?
+        cutoff = datetime.now(timezone.utc) - timedelta(seconds=settings.SMS_RESEND_SECONDS)
+        result = await db.execute(
+            select(VerificationCode).where(
+                VerificationCode.phone == phone,
+                VerificationCode.created_at > cutoff,
+            )
+        )
+        if result.scalar_one_or_none() is not None:
+            return False
 
-    code = generate_code()
-    code_key = f"sms:code:{phone}"
-    await redis_client.setex(code_key, settings.SMS_CODE_TTL, code)
-    await redis_client.setex(resent_key, settings.SMS_RESEND_SECONDS, "1")
-    logger.info(f"[SMS] phone={phone} code={code}")
-    return True
+        # Delete old codes for this phone
+        await db.execute(delete(VerificationCode).where(VerificationCode.phone == phone))
+
+        code = generate_code()
+        expires_at = datetime.now(timezone.utc) + timedelta(seconds=settings.SMS_CODE_TTL)
+        vc = VerificationCode(phone=phone, code=code, expires_at=expires_at)
+        db.add(vc)
+        await db.commit()
+
+        logger.info(f"[SMS] phone={phone} code={code}")
+        return True
 
 
 async def verify_code(phone: str, code: str) -> bool:
-    code_key = f"sms:code:{phone}"
-    stored = await redis_client.get(code_key)
-    if stored is None or stored != code:
-        return False
-    await redis_client.delete(code_key)
-    return True
+    async with async_session() as db:
+        now = datetime.now(timezone.utc)
+        result = await db.execute(
+            select(VerificationCode).where(
+                VerificationCode.phone == phone,
+                VerificationCode.code == code,
+                VerificationCode.expires_at > now,
+            )
+        )
+        vc = result.scalar_one_or_none()
+        if vc is None:
+            return False
+
+        await db.delete(vc)
+        await db.commit()
+        return True
