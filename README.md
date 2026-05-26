@@ -86,10 +86,10 @@ uv run alembic upgrade head
 pnpm dev
 
 # 或分别启动：
-pnpm dev:server    # FastAPI → http://localhost:8000
+pnpm dev:server    # FastAPI → http://localhost:8010
 ```
 
-后端启动后访问 <http://localhost:8000/docs> 查看 API 文档。
+后端启动后访问 <http://localhost:8010/docs> 查看 API 文档。
 
 ### 6. 启动鸿蒙端
 

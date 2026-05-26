@@ -1,7 +1,7 @@
 import { http } from '@kit.NetworkKit';
 import { preferences } from '@kit.ArkData';
 
-const BASE_URL = 'http://10.0.2.2:8000/api/v1';
+const BASE_URL = 'http://10.0.2.2:8010/api/v1';
 const TOKEN_KEY = 'auth_token';
 
 export class ApiClient {
