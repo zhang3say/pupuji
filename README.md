@@ -95,6 +95,8 @@ pnpm dev:server    # FastAPI → http://localhost:8010
 
 用 DevEco Studio 打开 `apps/harmony/` 目录，连接模拟器或真机运行。
 
+**重要**：鸿蒙项目需在 Windows 文件系统上打开，不能通过 WSL 网络路径 (`\\wsl.localhost\...`) 访问，否则 Hvigor 构建会报路径错误。
+
 ## 部署
 
 ```bash
