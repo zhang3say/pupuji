@@ -1,0 +1,12 @@
+{
+  "src": [
+    "pages/Index",
+    "pages/HomePage",
+    "pages/HistoryPage",
+    "pages/AchievementsPage",
+    "pages/ProfilePage",
+    "pages/LoginPage",
+    "pages/OnboardingPage",
+    "pages/SalarySetupPage"
+  ]
+}
