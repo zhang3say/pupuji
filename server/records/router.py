@@ -1,0 +1,147 @@
+import uuid
+from datetime import datetime, timezone
+
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from auth.dependencies import get_current_user
+from database import get_db
+from models.record import Record
+from models.user import User
+
+router = APIRouter(prefix="/api/v1/records", tags=["records"])
+
+
+def calc_minute_salary(user: User) -> float:
+    if not user.monthly_salary or user.monthly_salary <= 0:
+        return 0
+    days = float(user.work_days) or 21.75
+    hours = user.work_hours or 8
+    return float(user.monthly_salary) / days / hours / 60
+
+
+async def get_active_record(user_id: uuid.UUID, db: AsyncSession) -> Record | None:
+    result = await db.execute(
+        select(Record).where(Record.user_id == user_id, Record.status == "in_progress")
+    )
+    return result.scalar_one_or_none()
+
+
+def record_to_dict(r: Record) -> dict:
+    return {
+        "id": str(r.id),
+        "start_time": r.start_time.isoformat() if r.start_time else None,
+        "end_time": r.end_time.isoformat() if r.end_time else None,
+        "duration_seconds": r.duration_seconds,
+        "amount": float(r.amount),
+        "status": r.status,
+        "note": r.note,
+    }
+
+
+@router.post("/start", response_model=dict)
+async def start_record(
+    user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    active = await get_active_record(user.id, db)
+    if active:
+        return {"code": 1, "data": None, "message": "已有进行中的记录"}
+
+    record = Record(
+        user_id=user.id,
+        start_time=datetime.now(timezone.utc),
+        status="in_progress",
+    )
+    db.add(record)
+    await db.commit()
+    await db.refresh(record)
+    return {"code": 0, "data": record_to_dict(record), "message": "ok"}
+
+
+@router.get("/active", response_model=dict)
+async def get_active(
+    user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    active = await get_active_record(user.id, db)
+    if active is None:
+        return {"code": 0, "data": None, "message": "ok"}
+    return {"code": 0, "data": record_to_dict(active), "message": "ok"}
+
+
+@router.post("/{record_id}/pause", response_model=dict)
+async def pause_record(
+    record_id: uuid.UUID,
+    user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    result = await db.execute(
+        select(Record).where(Record.id == record_id, Record.user_id == user.id)
+    )
+    record = result.scalar_one_or_none()
+    if record is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    if record.status != "in_progress":
+        return {"code": 1, "data": None, "message": "记录不是进行中状态"}
+
+    now = datetime.now(timezone.utc)
+    elapsed = int((now - record.start_time).total_seconds())
+    record.duration_seconds += elapsed
+    record.start_time = None
+    await db.commit()
+    await db.refresh(record)
+    return {"code": 0, "data": record_to_dict(record), "message": "ok"}
+
+
+@router.post("/{record_id}/resume", response_model=dict)
+async def resume_record(
+    record_id: uuid.UUID,
+    user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    result = await db.execute(
+        select(Record).where(Record.id == record_id, Record.user_id == user.id)
+    )
+    record = result.scalar_one_or_none()
+    if record is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    if record.status != "in_progress":
+        return {"code": 1, "data": None, "message": "记录不是进行中状态"}
+
+    record.start_time = datetime.now(timezone.utc)
+    await db.commit()
+    return {"code": 0, "data": record_to_dict(record), "message": "ok"}
+
+
+@router.post("/{record_id}/finish", response_model=dict)
+async def finish_record(
+    record_id: uuid.UUID,
+    user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    result = await db.execute(
+        select(Record).where(Record.id == record_id, Record.user_id == user.id)
+    )
+    record = result.scalar_one_or_none()
+    if record is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    if record.status != "in_progress":
+        return {"code": 1, "data": None, "message": "记录不是进行中状态"}
+
+    now = datetime.now(timezone.utc)
+    additional = 0
+    if record.start_time:
+        additional = int((now - record.start_time).total_seconds())
+
+    record.duration_seconds += additional
+    record.end_time = now
+    record.status = "finished"
+
+    minute_salary = calc_minute_salary(user)
+    record.amount = round(minute_salary * record.duration_seconds / 60, 2)
+
+    await db.commit()
+    await db.refresh(record)
+    return {"code": 0, "data": record_to_dict(record), "message": "ok"}

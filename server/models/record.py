@@ -15,7 +15,7 @@ class Record(Base):
     user_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
     )
-    start_time: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    start_time: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=True)
     end_time: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=True)
     duration_seconds: Mapped[int] = mapped_column(Integer, default=0)
     amount: Mapped[float] = mapped_column(Numeric(10, 2), default=0)
