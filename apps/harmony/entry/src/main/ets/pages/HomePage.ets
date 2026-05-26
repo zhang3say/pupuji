@@ -152,7 +152,6 @@ export struct HomePage {
           .fontColor('#B8956A')
           .margin({ top: 60 })
 
-        // Timer card
         Column() {
           if (!this.isRunning) {
             Text('🦫').fontSize(80).margin({ bottom: 12 })
@@ -187,7 +186,6 @@ export struct HomePage {
         .borderRadius(20).margin({ top: 32 }).alignItems(HorizontalAlign.Center)
         .shadow({ radius: 12, color: '#00000010' })
 
-        // Today summary card
         Column() {
           Text('今日汇总')
             .fontSize(14).fontColor('#C5B8A0').margin({ bottom: 12 })
@@ -205,7 +203,6 @@ export struct HomePage {
       }
       .width('100%').alignItems(HorizontalAlign.Center)
 
-      // Result dialog
       if (this.showResult) {
         Column() {
           Column() {

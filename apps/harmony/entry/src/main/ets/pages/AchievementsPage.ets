@@ -2,9 +2,12 @@
 export struct AchievementsPage {
   build() {
     Column() {
-      Text('成就')
-        .fontSize(18)
-        .fontColor('#4A3728')
+      Text('🏆')
+        .fontSize(64)
+        .margin({ bottom: 12 })
+      Text('敬请期待')
+        .fontSize(16)
+        .fontColor('#C5B8A0')
     }
     .width('100%')
     .height('100%')

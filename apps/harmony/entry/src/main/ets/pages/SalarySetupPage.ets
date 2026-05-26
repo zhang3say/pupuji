@@ -35,93 +35,50 @@ export struct SalarySetupPage {
       router.back();
     } catch (e) {
       promptAction.showToast({ message: '保存失败' });
-    } finally {
-      this.loading = false;
-    }
+    } finally { this.loading = false; }
   }
 
   build() {
     Column() {
-      // Header
       Row() {
-        Button('←')
-          .fontSize(20)
-          .fontColor('#B8956A')
-          .backgroundColor('transparent')
+        Button('←').fontSize(20).fontColor('#B8956A').backgroundColor('transparent')
           .onClick(() => { router.back(); })
-        Text('薪资设置')
-          .fontSize(18)
-          .fontColor('#4A3728')
-          .margin({ left: 12 })
+        Text('薪资设置').fontSize(18).fontColor('#4A3728').margin({ left: 12 })
       }
-      .width('100%')
-      .padding(16)
-      .margin({ top: 36 })
+      .width('100%').padding(16).margin({ top: 36 })
 
-      // Form
       Column() {
         this.InputField('月薪 (元)', this.monthlySalary, (v) => { this.monthlySalary = v; }, InputType.Number)
         this.InputField('每月工作天数', this.workDays, (v) => { this.workDays = v; }, InputType.Number)
         this.InputField('每日工作小时', this.workHours, (v) => { this.workHours = v; }, InputType.Number)
 
-        // Minute salary preview
         Column() {
-          Text('每分钟薪资')
-            .fontSize(13)
-            .fontColor('#C5B8A0')
-          Text(`¥${this.minuteSalary}`)
-            .fontSize(40)
-            .fontWeight(FontWeight.Bold)
-            .fontColor('#B8956A')
-            .margin({ top: 4 })
+          Text('每分钟薪资').fontSize(13).fontColor('#C5B8A0')
+          Text(`¥${this.minuteSalary}`).fontSize(40).fontWeight(FontWeight.Bold).fontColor('#B8956A').margin({ top: 4 })
           Text(`月薪 ÷ ${this.workDays || '21.75'} 天 ÷ ${this.workHours || '8'} 小时 ÷ 60 分钟`)
-            .fontSize(12)
-            .fontColor('#C5B8A0')
-            .margin({ top: 4 })
+            .fontSize(12).fontColor('#C5B8A0').margin({ top: 4 })
         }
-        .width('100%')
-        .padding(24)
-        .margin({ top: 24 })
-        .backgroundColor('#FFF0E0')
-        .borderRadius(16)
-        .alignItems(HorizontalAlign.Center)
+        .width('100%').padding(24).margin({ top: 24 }).backgroundColor('#FFF0E0')
+        .borderRadius(16).alignItems(HorizontalAlign.Center)
 
         Button('保存')
-          .width('100%')
-          .height(52)
-          .fontSize(18)
-          .fontColor('#FFFFFF')
-          .backgroundColor('#B8956A')
-          .borderRadius(26)
-          .margin({ top: 32 })
+          .width('100%').height(52).fontSize(18).fontColor('#FFFFFF')
+          .backgroundColor('#B8956A').borderRadius(26).margin({ top: 32 })
           .onClick(() => { this.save(); })
       }
-      .width('80%')
-      .margin({ top: 32 })
+      .width('80%').margin({ top: 32 })
     }
-    .width('100%')
-    .height('100%')
-    .backgroundColor('#FFF8F0')
+    .width('100%').height('100%').backgroundColor('#FFF8F0')
   }
 
   @Builder
   InputField(label: string, value: string, onChange: (v: string) => void, type: InputType) {
     Column() {
-      Text(label)
-        .fontSize(13)
-        .fontColor('#4A3728')
-        .alignSelf(ItemAlign.Start)
-        .margin({ bottom: 6 })
+      Text(label).fontSize(13).fontColor('#4A3728').alignSelf(ItemAlign.Start).margin({ bottom: 6 })
       TextInput({ placeholder: label, text: value })
-        .type(type)
-        .fontSize(16)
-        .height(48)
-        .backgroundColor('#FFF0E0')
-        .borderRadius(12)
-        .padding({ left: 16, right: 16 })
-        .onChange(onChange)
+        .type(type).fontSize(16).height(48).backgroundColor('#FFF0E0').borderRadius(12)
+        .padding({ left: 16, right: 16 }).onChange(onChange)
     }
-    .width('100%')
-    .margin({ bottom: 16 })
+    .width('100%').margin({ bottom: 16 })
   }
 }

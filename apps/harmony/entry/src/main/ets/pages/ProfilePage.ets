@@ -1,7 +1,6 @@
 import { router } from '@kit.ArkUI';
 import { ApiClient } from '../common/api/ApiClient';
 import { authStore } from '../common/store/AuthStore';
-import { promptAction } from '@kit.ArkUI';
 
 interface UserInfo {
   id: string;
@@ -43,12 +42,10 @@ export struct ProfilePage {
 
   build() {
     Column() {
-      // Header
       Text('我的')
         .fontSize(28).fontWeight(FontWeight.Bold).fontColor('#B8956A')
         .margin({ top: 60, bottom: 24 })
 
-      // Avatar and name
       Column() {
         Text('🦫').fontSize(64)
         Text(this.user?.nickname || '噗友')
@@ -60,7 +57,6 @@ export struct ProfilePage {
       .borderRadius(16).margin({ bottom: 16 }).alignItems(HorizontalAlign.Center)
       .shadow({ radius: 8, color: '#00000008' })
 
-      // Info items
       Column() {
         this.InfoItem('薪资设置', this.salaryText, () => {
           router.pushUrl({ url: 'pages/SalarySetupPage' });
@@ -76,7 +72,6 @@ export struct ProfilePage {
       .width('85%').padding({ top: 8, bottom: 8 }).backgroundColor('#FFFFFF')
       .borderRadius(16).margin({ bottom: 16 }).shadow({ radius: 8, color: '#00000008' })
 
-      // Logout
       Button('退出登录')
         .width('85%').height(48).fontSize(16).fontColor('#E88B8B').backgroundColor('#FFFFFF')
         .borderRadius(24).margin({ top: 24 })

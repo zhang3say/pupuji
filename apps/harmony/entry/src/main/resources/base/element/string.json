@@ -1,6 +1,16 @@
 {
   "string": [
-    { "name": "app_name", "value": "噗噗记" },
-    { "name": "entry_desc", "value": "噗噗记 — 带薪拉屎 APP" }
+    {
+      "name": "module_desc",
+      "value": "噗噗记 — 带薪拉屎 APP"
+    },
+    {
+      "name": "EntryAbility_desc",
+      "value": "噗噗记"
+    },
+    {
+      "name": "EntryAbility_label",
+      "value": "噗噗记"
+    }
   ]
 }

@@ -74,7 +74,6 @@ export struct HistoryPage {
     return '';
   }
 
-  // Group records by date
   get groupedRecords(): Array<[string, RecordItem[]]> {
     const map = new Map<string, RecordItem[]>();
     for (const r of this.records) {
@@ -170,7 +169,6 @@ export struct HistoryPage {
       }
       .width('100%').height('100%').backgroundColor('#FFF8F0')
 
-      // Manual record form dialog
       if (this.showForm) {
         Column() {
           Column() {

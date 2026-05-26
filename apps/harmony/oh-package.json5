@@ -1,9 +1,10 @@
 {
-  "modelVersion": "5.0.0",
-  "description": "噗噗记 — 带薪拉屎 APP",
-  "dependencies": {},
+  "modelVersion": "6.1.0",
+  "description": "Please describe the basic information.",
+  "dependencies": {
+  },
   "devDependencies": {
-    "@ohos/hvigor": "5.0.0",
-    "@ohos/hvigor-ohos-plugin": "5.0.0"
+    "@ohos/hypium": "1.0.25",
+    "@ohos/hamock": "1.0.0"
   }
 }
