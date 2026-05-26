@@ -1,4 +1,3 @@
-import { router } from '@kit.ArkUI';
 import { ApiClient } from '../common/api/ApiClient';
 import { authStore } from '../common/store/AuthStore';
 
@@ -59,7 +58,7 @@ export struct ProfilePage {
 
       Column() {
         this.InfoItem('薪资设置', this.salaryText, () => {
-          router.pushUrl({ url: 'pages/SalarySetupPage' });
+          this.getUIContext().getRouter().pushUrl({ url: 'pages/SalarySetupPage' });
         }, true)
         Divider().color('#FFF0E0').width('90%')
 

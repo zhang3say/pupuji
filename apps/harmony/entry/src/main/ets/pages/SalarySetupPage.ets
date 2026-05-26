@@ -1,6 +1,4 @@
 import { ApiClient } from '../common/api/ApiClient';
-import { router } from '@kit.ArkUI';
-import { promptAction } from '@kit.ArkUI';
 
 @Component
 export struct SalarySetupPage {
@@ -18,10 +16,16 @@ export struct SalarySetupPage {
     return minute.toFixed(2);
   }
 
+  showToast(message: string): void {
+    try {
+      this.getUIContext().getPromptAction().showToast({ message, duration: 2000 });
+    } catch (e) {}
+  }
+
   async save(): Promise<void> {
     const salary = parseFloat(this.monthlySalary);
     if (isNaN(salary) || salary <= 0) {
-      promptAction.showToast({ message: '请输入有效的月薪' });
+      this.showToast('请输入有效的月薪');
       return;
     }
     this.loading = true;
@@ -31,10 +35,10 @@ export struct SalarySetupPage {
         work_days: parseFloat(this.workDays) || 21.75,
         work_hours: parseInt(this.workHours) || 8,
       });
-      promptAction.showToast({ message: '保存成功' });
-      router.back();
+      this.showToast('保存成功');
+      this.getUIContext().getRouter().back();
     } catch (e) {
-      promptAction.showToast({ message: '保存失败' });
+      this.showToast('保存失败');
     } finally { this.loading = false; }
   }
 
@@ -42,14 +46,14 @@ export struct SalarySetupPage {
     Column() {
       Row() {
         Button('←').fontSize(20).fontColor('#B8956A').backgroundColor('transparent')
-          .onClick(() => { router.back(); })
+          .onClick(() => { this.getUIContext().getRouter().back(); })
         Text('薪资设置').fontSize(18).fontColor('#4A3728').margin({ left: 12 })
       }
       .width('100%').padding(16).margin({ top: 36 })
 
       Column() {
-        this.InputField('月薪 (元)', this.monthlySalary, (v) => { this.monthlySalary = v; }, InputType.Number)
-        this.InputField('每月工作天数', this.workDays, (v) => { this.workDays = v; }, InputType.Number)
+        this.InputField('月薪 (元)', this.monthlySalary, (v) => { this.monthlySalary = v; }, InputType.NUMBER_DECIMAL)
+        this.InputField('每月工作天数', this.workDays, (v) => { this.workDays = v; }, InputType.NUMBER_DECIMAL)
         this.InputField('每日工作小时', this.workHours, (v) => { this.workHours = v; }, InputType.Number)
 
         Column() {

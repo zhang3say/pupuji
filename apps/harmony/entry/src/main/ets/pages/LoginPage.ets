@@ -1,6 +1,5 @@
 import { ApiClient } from '../common/api/ApiClient';
 import { authStore } from '../common/store/AuthStore';
-import { promptAction } from '@kit.ArkUI';
 
 @Component
 export struct LoginPage {
@@ -27,29 +26,35 @@ export struct LoginPage {
     }, 1000);
   }
 
+  showToast(message: string): void {
+    try {
+      this.getUIContext().getPromptAction().showToast({ message, duration: 2000 });
+    } catch (e) {}
+  }
+
   async sendCode(): Promise<void> {
     if (this.countdown > 0) return;
     if (this.phone.length !== 11) {
-      promptAction.showToast({ message: '请输入正确的手机号' });
+      this.showToast('请输入正确的手机号');
       return;
     }
     this.loading = true;
     try {
       await ApiClient.request('POST', '/auth/send-code', { phone: this.phone });
       this.startCountdown();
-      promptAction.showToast({ message: '验证码已发送' });
+      this.showToast('验证码已发送');
     } catch (e) {
-      promptAction.showToast({ message: '发送失败，请重试' });
+      this.showToast('发送失败，请重试');
     } finally { this.loading = false; }
   }
 
   async doLogin(): Promise<void> {
     if (this.phone.length !== 11) {
-      promptAction.showToast({ message: '请输入正确的手机号' });
+      this.showToast('请输入正确的手机号');
       return;
     }
     if (this.code.length !== 6) {
-      promptAction.showToast({ message: '请输入6位验证码' });
+      this.showToast('请输入6位验证码');
       return;
     }
     this.loading = true;
@@ -57,7 +62,7 @@ export struct LoginPage {
       await authStore.login(this.phone, this.code);
       this.onLoginSuccess();
     } catch (e) {
-      promptAction.showToast({ message: '登录失败，请检查验证码' });
+      this.showToast('登录失败，请检查验证码');
     } finally { this.loading = false; }
   }
 

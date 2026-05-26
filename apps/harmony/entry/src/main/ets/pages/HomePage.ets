@@ -99,7 +99,7 @@ export struct HomePage {
       this.isPaused = false;
       this.startTick();
     } catch (e: any) {
-      promptAction.showToast({ message: e.message || '开始失败' });
+      this.showToast(e.message || '开始失败');
     } finally { this.loading = false; }
   }
 
@@ -111,7 +111,7 @@ export struct HomePage {
       this.isPaused = true;
     } catch (e) {
       this.startTick();
-      promptAction.showToast({ message: '暂停失败' });
+      this.showToast('暂停失败');
     } finally { this.loading = false; }
   }
 
@@ -122,7 +122,7 @@ export struct HomePage {
       this.isPaused = false;
       this.startTick();
     } catch (e) {
-      promptAction.showToast({ message: '继续失败' });
+      this.showToast('继续失败');
     } finally { this.loading = false; }
   }
 
@@ -139,8 +139,14 @@ export struct HomePage {
       this.loadSummary();
     } catch (e) {
       this.startTick();
-      promptAction.showToast({ message: '结束失败' });
+      this.showToast('结束失败');
     } finally { this.loading = false; }
+  }
+
+  showToast(message: string): void {
+    try {
+      this.getUIContext().getPromptAction().showToast({ message, duration: 2000 });
+    } catch (e) {}
   }
 
   build() {

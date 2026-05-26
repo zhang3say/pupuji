@@ -1,5 +1,4 @@
 import { ApiClient } from '../common/api/ApiClient';
-import { promptAction } from '@kit.ArkUI';
 
 interface RecordItem {
   id: string;
@@ -23,6 +22,12 @@ export struct HistoryPage {
 
   aboutToAppear(): void { this.loadRecords(); }
 
+  showToast(message: string): void {
+    try {
+      this.getUIContext().getPromptAction().showToast({ message, duration: 2000 });
+    } catch (e) {}
+  }
+
   async loadRecords(): Promise<void> {
     if (this.loading || !this.hasMore) return;
     this.loading = true;
@@ -31,14 +36,14 @@ export struct HistoryPage {
       this.records = [...this.records, ...(data.items || [])];
       this.hasMore = data.has_more;
       this.page++;
-    } catch (e) { promptAction.showToast({ message: '加载失败' }); }
+    } catch (e) { this.showToast('加载失败'); }
     finally { this.loading = false; }
   }
 
   async submitManual(): Promise<void> {
     const mins = parseInt(this.formMinutes);
     if (!this.formTime || isNaN(mins) || mins <= 0) {
-      promptAction.showToast({ message: '请填写开始时间和时长' });
+      this.showToast('请填写开始时间和时长');
       return;
     }
     try {
@@ -47,12 +52,12 @@ export struct HistoryPage {
         duration_minutes: mins,
         note: this.formNote || null,
       });
-      promptAction.showToast({ message: '记录成功' });
+      this.showToast('记录成功');
       this.showForm = false;
       this.formTime = ''; this.formMinutes = ''; this.formNote = '';
       this.page = 1; this.hasMore = true; this.records = [];
       this.loadRecords();
-    } catch (e: any) { promptAction.showToast({ message: e.message || '记录失败' }); }
+    } catch (e: any) { this.showToast(e.message || '记录失败'); }
   }
 
   formatTime(iso: string): string {
