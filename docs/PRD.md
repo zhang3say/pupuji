@@ -102,7 +102,7 @@
 - 白噪音（水流声等）
 - Lottie 动画（金币掉落、温泉动画、完成庆祝）
 - 卡皮巴拉互动对话
-- 鸿蒙端
+- iOS / Android 端
 
 ---
 
@@ -113,34 +113,34 @@
 ```
 pupuji/
 ├── apps/
-│   ├── mobile-rn/      # React Native（iOS/Android）
 │   └── harmony/        # 鸿蒙原生（ArkTS/ArkUI）
 ├── server/             # FastAPI 后端
 ├── packages/
-│   └── shared/         # 共享 TypeScript 类型定义、常量
+│   └── shared/         # 共享 TypeScript 类型定义（ArkTS 复用）
 ├── pnpm-workspace.yaml
 └── package.json
 ```
 
 - Monorepo 管理：pnpm workspace
+- 鸿蒙工程：Hvigor 构建，DevEco Studio IDE
 - 版本控制：GitHub Flow（main + feature 分支）
 
 ### 4.2 技术栈
 
 | 层 | 技术 | 说明 |
 |----|------|------|
-| 移动端 | React Native | iOS 为主 |
-| 状态管理 | Zustand | 轻量简洁 |
-| 导航 | React Navigation | RN 导航标准 |
-| HTTP | Axios | 网络请求 |
-| 动画 | Reanimated 3 + Lottie | UI 动效 |
+| 鸿蒙端 | ArkTS / ArkUI | HarmonyOS NEXT (API 12+) |
+| 状态管理 | @State + AppStorage | 原生状态管理 |
+| 导航 | Navigation + Tabs | 官方导航组件 |
+| 网络请求 | @ohos.net.http | 官方 HTTP 模块 |
+| 本地存储 | @ohos.data.preferences | Key-Value 持久化 |
 | 后端 | FastAPI | Python 异步框架 |
 | 数据库 | PostgreSQL | 主数据存储 |
 | ORM | SQLAlchemy 2.0 | 数据层 |
 | 迁移 | Alembic | 数据库版本管理 |
 | 缓存 | Redis | 排行榜/验证码 |
 | 部署 | ECS + Docker | 手动部署 |
-| 测试 | pytest + jest | 关键路径覆盖 |
+| 测试 | pytest | 关键路径覆盖 |
 
 ### 4.3 API 规范
 
@@ -163,7 +163,9 @@ pupuji/
 
 | 类别 | 工具 |
 |------|------|
-| 代码规范（RN） | ESLint + Prettier |
+| IDE | DevEco Studio（鸿蒙）+ VS Code（后端） |
+| 构建 | Hvigor（鸿蒙） |
+| 代码规范（鸿蒙） | DevEco Studio 内置 Lint/格式化 |
 | 代码规范（Python） | Ruff |
 | Git Hook | pre-commit |
 | 部署 | 手动 `git pull && docker-compose up -d` |
@@ -265,7 +267,7 @@ pupuji/
 
 ### Phase 1: MVP（4-6 周）
 - 所有 P0 功能
-- iOS 首发（React Native）
+- 鸿蒙 NEXT 首发（ArkTS/ArkUI）
 - 后端 API + 数据库
 - 基础 UI（极简风格 + emoji）
 
@@ -277,9 +279,8 @@ pupuji/
 - 排行榜
 
 ### Phase 3: 扩展（持续）
-- Android 端上线
+- iOS / Android 端上线
 - P2 功能
-- 鸿蒙端开发
 
 ---
 
