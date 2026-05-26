@@ -1,5 +1,10 @@
+import { http } from '@kit.NetworkKit';
 import { ApiClient } from '../common/api/ApiClient';
 import { authStore } from '../common/store/AuthStore';
+
+interface SendCodeData {
+  phone: string;
+}
 
 @Component
 export struct LoginPage {
@@ -40,7 +45,9 @@ export struct LoginPage {
     }
     this.loading = true;
     try {
-      await ApiClient.request('POST', '/auth/send-code', { phone: this.phone });
+      await ApiClient.request<void>(http.RequestMethod.POST, '/auth/send-code', {
+        phone: this.phone
+      } as SendCodeData);
       this.startCountdown();
       this.showToast('验证码已发送');
     } catch (e) {

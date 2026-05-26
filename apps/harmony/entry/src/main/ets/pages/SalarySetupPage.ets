@@ -1,11 +1,47 @@
+import { http } from '@kit.NetworkKit';
 import { ApiClient } from '../common/api/ApiClient';
 
+interface UserResponse {
+  monthly_salary: number | null;
+  work_days: number;
+  work_hours: number;
+}
+
+interface SalaryData {
+  monthly_salary: number;
+  work_days: number;
+  work_hours: number;
+}
+
+@Entry
 @Component
-export struct SalarySetupPage {
+struct SalarySetupPage {
   @State monthlySalary: string = '';
   @State workDays: string = '21.75';
   @State workHours: string = '8';
   @State loading: boolean = false;
+
+  aboutToAppear(): void {
+    this.loadExisting();
+  }
+
+  async loadExisting(): Promise<void> {
+    try {
+      const user = await ApiClient.request<UserResponse>(http.RequestMethod.GET, '/users/me');
+      const salary = user.monthly_salary;
+      const days = user.work_days;
+      const hours = user.work_hours;
+      if (salary !== null && salary !== undefined) {
+        this.monthlySalary = salary.toString();
+      }
+      if (days !== null && days !== undefined) {
+        this.workDays = days.toString();
+      }
+      if (hours !== null && hours !== undefined) {
+        this.workHours = hours.toString();
+      }
+    } catch (e) {}
+  }
 
   get minuteSalary(): string {
     const salary = parseFloat(this.monthlySalary) || 0;
@@ -30,11 +66,12 @@ export struct SalarySetupPage {
     }
     this.loading = true;
     try {
-      await ApiClient.request('PUT', '/users/salary', {
+      await ApiClient.request<void>(http.RequestMethod.PUT, '/users/salary', {
         monthly_salary: salary,
         work_days: parseFloat(this.workDays) || 21.75,
         work_hours: parseInt(this.workHours) || 8,
-      });
+      } as SalaryData);
+      AppStorage.setOrCreate('profileRefreshSignal', Date.now());
       this.showToast('保存成功');
       this.getUIContext().getRouter().back();
     } catch (e) {

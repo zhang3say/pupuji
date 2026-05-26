@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import DateTime, String
+from sqlalchemy import DateTime, String, func
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -15,4 +15,4 @@ class VerificationCode(Base):
     phone: Mapped[str] = mapped_column(String(20), nullable=False, index=True)
     code: Mapped[str] = mapped_column(String(6), nullable=False)
     expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default="now()")
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=func.now())

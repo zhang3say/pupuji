@@ -1,5 +1,5 @@
+import { http } from '@kit.NetworkKit';
 import { ApiClient } from '../common/api/ApiClient';
-import { promptAction } from '@kit.ArkUI';
 
 interface RecordData {
   id: string;
@@ -14,6 +14,12 @@ interface SummaryData {
   total_duration_seconds: number;
   total_amount: number;
   company_paid: number;
+}
+
+interface ActiveRecord {
+  id: string;
+  duration_seconds: number;
+  start_time: string | null;
 }
 
 @Component
@@ -42,7 +48,7 @@ export struct HomePage {
 
   async loadSummary(): Promise<void> {
     try {
-      this.summary = await ApiClient.request<SummaryData>('GET', '/records/today-summary');
+      this.summary = await ApiClient.request<SummaryData>(http.RequestMethod.GET, '/records/today-summary');
     } catch (e) {}
   }
 
@@ -69,7 +75,7 @@ export struct HomePage {
 
   async checkActive(): Promise<void> {
     try {
-      const data = await ApiClient.request<any>('GET', '/records/active');
+      const data = await ApiClient.request<ActiveRecord>(http.RequestMethod.GET, '/records/active');
       if (data && data.id) {
         this.recordId = data.id;
         this.elapsedSeconds = data.duration_seconds || 0;
@@ -92,14 +98,14 @@ export struct HomePage {
   async start(): Promise<void> {
     this.loading = true;
     try {
-      const data = await ApiClient.request<RecordData>('POST', '/records/start');
+      const data = await ApiClient.request<RecordData>(http.RequestMethod.POST, '/records/start');
       this.recordId = data.id;
       this.elapsedSeconds = 0;
       this.isRunning = true;
       this.isPaused = false;
       this.startTick();
-    } catch (e: any) {
-      this.showToast(e.message || '开始失败');
+    } catch (e) {
+      this.showToast('开始失败');
     } finally { this.loading = false; }
   }
 
@@ -107,7 +113,7 @@ export struct HomePage {
     this.loading = true;
     this.stopTick();
     try {
-      await ApiClient.request('POST', `/records/${this.recordId}/pause`);
+      await ApiClient.request<void>(http.RequestMethod.POST, `/records/${this.recordId}/pause`);
       this.isPaused = true;
     } catch (e) {
       this.startTick();
@@ -118,7 +124,7 @@ export struct HomePage {
   async resume(): Promise<void> {
     this.loading = true;
     try {
-      await ApiClient.request('POST', `/records/${this.recordId}/resume`);
+      await ApiClient.request<void>(http.RequestMethod.POST, `/records/${this.recordId}/resume`);
       this.isPaused = false;
       this.startTick();
     } catch (e) {
@@ -130,7 +136,7 @@ export struct HomePage {
     this.loading = true;
     this.stopTick();
     try {
-      const data = await ApiClient.request<RecordData>('POST', `/records/${this.recordId}/finish`);
+      const data = await ApiClient.request<RecordData>(http.RequestMethod.POST, `/records/${this.recordId}/finish`);
       this.isRunning = false;
       this.isPaused = false;
       this.resultDuration = data.duration_seconds;

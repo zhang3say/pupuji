@@ -9,6 +9,23 @@ from users.schemas import SalaryUpdateRequest
 router = APIRouter(prefix="/api/v1/users", tags=["users"])
 
 
+@router.get("/me", response_model=dict)
+async def get_me(user: User = Depends(get_current_user)):
+    return {
+        "code": 0,
+        "data": {
+            "id": str(user.id),
+            "phone": user.phone,
+            "nickname": user.nickname,
+            "avatar": user.avatar,
+            "monthly_salary": float(user.monthly_salary) if user.monthly_salary else None,
+            "work_days": float(user.work_days),
+            "work_hours": user.work_hours,
+        },
+        "message": "ok",
+    }
+
+
 @router.put("/salary", response_model=dict)
 async def update_salary(
     req: SalaryUpdateRequest,

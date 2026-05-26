@@ -1,25 +1,41 @@
+import { http } from '@kit.NetworkKit';
 import { ApiClient } from '../common/api/ApiClient';
 import { authStore } from '../common/store/AuthStore';
 
-interface UserInfo {
-  id: string;
-  phone: string;
-  nickname: string | null;
-  monthly_salary: number | null;
-  work_days: number;
-  work_hours: number;
+class ProfileData {
+  id: string = '';
+  phone: string = '';
+  nickname: string | null = null;
+  monthly_salary: number | null = null;
+  work_days: number = 21.75;
+  work_hours: number = 8;
 }
 
 @Component
 export struct ProfilePage {
   onLogout: () => void = () => {};
-  @State user: UserInfo | null = null;
+  @StorageLink('profileRefreshSignal') @Watch('onRefreshSignal') refreshSignal: number = 0;
+  @State user: ProfileData | null = null;
 
-  aboutToAppear(): void { this.loadUser(); }
+  aboutToAppear(): void {
+    this.loadUser();
+  }
+
+  onRefreshSignal(): void {
+    this.loadUser();
+  }
 
   async loadUser(): Promise<void> {
     try {
-      this.user = await ApiClient.request<UserInfo>('GET', '/users/me');
+      const resp = await ApiClient.request<ProfileData>(http.RequestMethod.GET, '/users/me');
+      const data = new ProfileData();
+      data.id = resp.id;
+      data.phone = resp.phone;
+      data.nickname = resp.nickname;
+      data.monthly_salary = resp.monthly_salary;
+      data.work_days = resp.work_days;
+      data.work_hours = resp.work_hours;
+      this.user = data;
     } catch (e) {}
   }
 
@@ -30,8 +46,14 @@ export struct ProfilePage {
   }
 
   get salaryText(): string {
-    if (!this.user || !this.user.monthly_salary) return '未设置';
+    if (!this.user || this.user.monthly_salary === null) return '未设置';
     return `¥${this.user.monthly_salary.toLocaleString()} / 月`;
+  }
+
+  get hourlyRateText(): string {
+    if (!this.user || this.user.monthly_salary === null) return '--';
+    const hourly = this.user.monthly_salary / (this.user.work_days * this.user.work_hours);
+    return `¥${hourly.toFixed(2)}/h`;
   }
 
   async logout(): Promise<void> {
@@ -62,7 +84,7 @@ export struct ProfilePage {
         }, true)
         Divider().color('#FFF0E0').width('90%')
 
-        this.InfoItem('时薪', this.user ? `¥${(this.user.monthly_salary || 0) / (this.user.work_days * this.user.work_hours)}/h` : '--', undefined, false)
+        this.InfoItem('时薪', this.hourlyRateText, undefined, false)
 
         Divider().color('#FFF0E0').width('90%')
 
@@ -73,7 +95,7 @@ export struct ProfilePage {
 
       Button('退出登录')
         .width('85%').height(48).fontSize(16).fontColor('#E88B8B').backgroundColor('#FFFFFF')
-        .borderRadius(24).margin({ top: 24 })
+        .borderRadius(24).margin({ top: 12 })
         .shadow({ radius: 8, color: '#00000008' })
         .onClick(() => { this.logout(); })
     }

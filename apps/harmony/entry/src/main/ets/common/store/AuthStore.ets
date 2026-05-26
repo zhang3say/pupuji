@@ -1,33 +1,65 @@
+import { http } from '@kit.NetworkKit';
 import { preferences } from '@kit.ArkData';
 import { ApiClient } from '../api/ApiClient';
+import { HostContext } from './HostContext';
 
 const ONBOARDING_KEY = 'onboarding_done';
+
+interface LoginData {
+  token: string;
+  user: UserInfo;
+}
+
+interface LoginRequest {
+  phone: string;
+  code: string;
+}
+
+async function getPrefs(): Promise<preferences.Preferences> {
+  try {
+    return await preferences.getPreferences(HostContext.get(), 'pupuji');
+  } catch (e) {
+    throw new Error('Failed to get preferences');
+  }
+}
 
 export class AuthStore {
   token: string = '';
   user: UserInfo | null = null;
 
   async hydrate(): Promise<void> {
-    const prefs = await preferences.getPreferences(getContext(), 'pupuji');
-    this.token = prefs.get('auth_token', '') as string;
+    try {
+      const prefs = await getPrefs();
+      const saved = await prefs.get('auth_token', '');
+      this.token = saved as string;
+    } catch (e) {
+      this.token = '';
+    }
   }
 
   async isOnboardingDone(): Promise<boolean> {
-    const prefs = await preferences.getPreferences(getContext(), 'pupuji');
-    return prefs.get(ONBOARDING_KEY, false) as Promise<boolean>;
+    try {
+      const prefs = await getPrefs();
+      const done = await prefs.get(ONBOARDING_KEY, false);
+      return done as boolean;
+    } catch (e) {
+      return false;
+    }
   }
 
   async setOnboardingDone(): Promise<void> {
-    const prefs = await preferences.getPreferences(getContext(), 'pupuji');
-    await prefs.put(ONBOARDING_KEY, true);
-    await prefs.flush();
+    try {
+      const prefs = await getPrefs();
+      await prefs.put(ONBOARDING_KEY, true);
+      await prefs.flush();
+    } catch (e) {
+      // silently fail
+    }
   }
 
   async login(phone: string, code: string): Promise<void> {
-    const data = await ApiClient.request<{ token: string; user: UserInfo }>('POST', '/auth/login', {
-      phone,
-      code,
-    });
+    const req: LoginRequest = { phone, code };
+    const data = await ApiClient.request<LoginData>(http.RequestMethod.POST, '/auth/login', req);
     this.token = data.token;
     this.user = data.user;
     await ApiClient.setToken(data.token);

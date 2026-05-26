@@ -1,6 +1,20 @@
 {
   "app": {
-    "signingConfigs": [],
+    "signingConfigs": [
+      {
+        "name": "default",
+        "type": "HarmonyOS",
+        "material": {
+          "certpath": "C:\\Users\\leezi\\.ohos\\config\\default_harmony_WnYsB1AxdIApPaSn0zXPBLauNh5J06HuB0rYEZ3y2ek=.cer",
+          "keyAlias": "debugKey",
+          "keyPassword": "0000001B8C02B44E81AE9B72B7354FCE0B28C0E1AFAA2057711DA6558610BE15B0C6790ADA02A90AE8086D",
+          "profile": "C:\\Users\\leezi\\.ohos\\config\\default_harmony_WnYsB1AxdIApPaSn0zXPBLauNh5J06HuB0rYEZ3y2ek=.p7b",
+          "signAlg": "SHA256withECDSA",
+          "storeFile": "C:\\Users\\leezi\\.ohos\\config\\default_harmony_WnYsB1AxdIApPaSn0zXPBLauNh5J06HuB0rYEZ3y2ek=.p12",
+          "storePassword": "0000001B8D7BAB55BE8F4D7A333E9C7A192F1C66A75155B634C2C0E3DA565021A1DE861958D3B6E38457F2"
+        }
+      }
+    ],
     "products": [
       {
         "name": "default",

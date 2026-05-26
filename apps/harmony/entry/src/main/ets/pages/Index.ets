@@ -1,4 +1,10 @@
 import { authStore } from '../common/store/AuthStore';
+import { OnboardingPage } from './OnboardingPage';
+import { LoginPage } from './LoginPage';
+import { HomePage } from './HomePage';
+import { HistoryPage } from './HistoryPage';
+import { AchievementsPage } from './AchievementsPage';
+import { ProfilePage } from './ProfilePage';
 
 @Entry
 @Component
@@ -18,6 +24,10 @@ struct Index {
       const done = await authStore.isOnboardingDone();
       this.showOnboarding = !done;
     }
+  }
+
+  onPageShow(): void {
+    AppStorage.setOrCreate('profileRefreshSignal', Date.now());
   }
 
   build() {

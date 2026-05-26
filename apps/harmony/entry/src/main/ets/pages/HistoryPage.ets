@@ -1,3 +1,4 @@
+import { http } from '@kit.NetworkKit';
 import { ApiClient } from '../common/api/ApiClient';
 
 interface RecordItem {
@@ -6,6 +7,17 @@ interface RecordItem {
   duration_seconds: number;
   amount: number;
   status: string;
+  note: string | null;
+}
+
+interface HistoryData {
+  items: RecordItem[];
+  has_more: boolean;
+}
+
+interface ManualRecordData {
+  start_time: string;
+  duration_minutes: number;
   note: string | null;
 }
 
@@ -32,8 +44,10 @@ export struct HistoryPage {
     if (this.loading || !this.hasMore) return;
     this.loading = true;
     try {
-      const data = await ApiClient.request<any>('GET', `/records/history?page=${this.page}&page_size=20`);
-      this.records = [...this.records, ...(data.items || [])];
+      const data = await ApiClient.request<HistoryData>(http.RequestMethod.GET, `/records/history?page=${this.page}&page_size=20`);
+      const items = data.items || [];
+      const merged = this.records.concat(items);
+      this.records = merged;
       this.hasMore = data.has_more;
       this.page++;
     } catch (e) { this.showToast('加载失败'); }
@@ -47,17 +61,17 @@ export struct HistoryPage {
       return;
     }
     try {
-      await ApiClient.request('POST', '/records/manual', {
+      await ApiClient.request<void>(http.RequestMethod.POST, '/records/manual', {
         start_time: this.formTime,
         duration_minutes: mins,
         note: this.formNote || null,
-      });
+      } as ManualRecordData);
       this.showToast('记录成功');
       this.showForm = false;
       this.formTime = ''; this.formMinutes = ''; this.formNote = '';
       this.page = 1; this.hasMore = true; this.records = [];
       this.loadRecords();
-    } catch (e: any) { this.showToast(e.message || '记录失败'); }
+    } catch (e) { this.showToast('记录失败'); }
   }
 
   formatTime(iso: string): string {

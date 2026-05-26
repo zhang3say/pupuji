@@ -1,8 +1,8 @@
 """init
 
-Revision ID: 94f8e14da90e
-Revises: 099794a7b57c
-Create Date: 2026-05-26 13:36:26.009995
+Revision ID: 8f9b62fb8442
+Revises: 94f8e14da90e
+Create Date: 2026-05-26 14:56:32.589282
 """
 from typing import Sequence, Union
 
@@ -10,8 +10,8 @@ from alembic import op
 import sqlalchemy as sa
 
 
-revision: str = '94f8e14da90e'
-down_revision: Union[str, None] = '099794a7b57c'
+revision: str = '8f9b62fb8442'
+down_revision: Union[str, None] = '94f8e14da90e'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 

@@ -1,4 +1,3 @@
-import logging
 import random
 from datetime import datetime, timedelta, timezone
 
@@ -8,8 +7,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from config import settings
 from database import async_session
 from models.verification_code import VerificationCode
-
-logger = logging.getLogger(__name__)
 
 
 def generate_code() -> str:
@@ -38,7 +35,7 @@ async def send_code(phone: str) -> bool:
         db.add(vc)
         await db.commit()
 
-        logger.info(f"[SMS] phone={phone} code={code}")
+        print(f"[SMS] phone={phone} code={code}")
         return True
 
 
